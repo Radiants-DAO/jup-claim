@@ -12,6 +12,7 @@ import { createAssociatedTokenAccountInstruction, createTransferCheckedInstructi
 import { newClaimIx } from "../ix/new-claim";
 import {proofs} from '../proofs/allProofs';
 import { JUP } from "../constants";
+import { program } from "../config";
 
 const runInstruction = async () => {
     console.log("Beginning Claim Script")
@@ -35,7 +36,7 @@ const runInstruction = async () => {
         let claimant = new PublicKey(item);
         let signer = Keypair.fromSecretKey(new Uint8Array(JSON.parse(kp)));
         
-        let provider = new anchor.AnchorProvider(new Connection("rpc-goes-here"), new anchor.Wallet(signer), {commitment: "confirmed"})
+        let provider = new anchor.AnchorProvider(program.provider.connection, new anchor.Wallet(signer), {commitment: "confirmed"})
 
         // distributor
         let merkleTree = new PublicKey(oneClaimData.merkle_tree);

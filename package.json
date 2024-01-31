@@ -2,6 +2,7 @@
     "scripts": {
         "gen-distributors": "ts-node cli/commands/gen-distributors.ts",
         "gen-proofs": "ts-node cli/commands/gen-proofs.ts",
+        "gen-kps": "ts-node cli/commands/gen-kps.ts",
         "claim-jup": "ts-node cli/commands/claim-jup.ts",
         "claim-jup-surrogate": "ts-node cli/commands/claim-jup-surrogate.ts"
     },
