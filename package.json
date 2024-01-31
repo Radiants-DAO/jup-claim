@@ -2,7 +2,8 @@
     "scripts": {
         "gen-distributors": "ts-node cli/commands/gen-distributors.ts",
         "gen-proofs": "ts-node cli/commands/gen-proofs.ts",
-        "claim-jup": "ts-node cli/commands/claim-jup.ts"
+        "claim-jup": "ts-node cli/commands/claim-jup.ts",
+        "claim-jup-surrogate": "ts-node cli/commands/claim-jup-surrogate.ts"
     },
     "dependencies": {
         "@coral-xyz/anchor": "^0.28.0",

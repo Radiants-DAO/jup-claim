@@ -8,7 +8,7 @@
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import fs from 'fs';
 import * as anchor from '@coral-xyz/anchor';
-import { createAssociatedTokenAccountInstruction, getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { createAssociatedTokenAccountInstruction, createTransferCheckedInstruction, getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { newClaimIx } from "../ix/new-claim";
 import {proofs} from '../proofs/allProofs';
 import { JUP } from "../constants";
@@ -21,7 +21,7 @@ const runInstruction = async () => {
     let proofsCopy: any = proofs;
 
     let kpMatch: any = {
-        'JuPQbT4jvSKu2sLD6FJRD9tQhfKGNefH1Bvh6HsTDq9': 'jupKps/JuPQbT4jvSKu2sLD6FJRD9tQhfKGNefH1Bvh6HsTDq9.json',
+        'JuPQbT4jvSKu2sLD6FJRD9tQhfKGNefH1Bvh6HsTDq9': 'keypairs/JuPQbT4jvSKu2sLD6FJRD9tQhfKGNefH1Bvh6HsTDq9.json',
     };
 
     for(let item in proofsCopy) {
@@ -62,7 +62,15 @@ const runInstruction = async () => {
         claimTx.add(createAssociatedTokenAccountInstruction(claimant, claimantAta, claimant, JUP));
         claimTx.add(claimIx);
 
-        let finalTx = await provider.sendAndConfirm(claimTx, [], {skipPreflight: true});
+        // add transfer to single destination wallet
+        let destinationWallet = fs.readFileSync(`./cli/keypairs/JuPQbT4jvSKu2sLD6FJRD9tQhfKGNefH1Bvh6HsTDq9.json`, {encoding: 'utf-8'});
+        let destinationSigner = Keypair.fromSecretKey(new Uint8Array(JSON.parse(destinationWallet)));
+        const destinationAta = getAssociatedTokenAddressSync(JUP, destinationSigner.publicKey);
+
+        claimTx.add(createTransferCheckedInstruction(claimantAta, JUP, destinationAta, claimant, amountToClaim, 6));
+        claimTx.feePayer = destinationSigner.publicKey;
+
+        let finalTx = await provider.sendAndConfirm(claimTx, [destinationSigner], {skipPreflight: true});
         if(finalTx) {
             txs.push(finalTx);
         } else {
